@@ -4,8 +4,10 @@ from fastapi import APIRouter, HTTPException, Path, Query, status
 
 from crawl_skku.article.cscience import constants
 from crawl_skku.article.cscience.dependencies import CscienceArticlePostServiceDep
-from crawl_skku.article.cscience.schemas import CscienceArticlePostDetail
-from crawl_skku.article.schemas import ArticlePostListItem
+from crawl_skku.article.cscience.schemas import (
+    CscienceArticlePostDetail,
+    SkkuCscienceArticlePostListItem,
+)
 from crawl_skku.exceptions import SkkuCrawlerError
 
 router = APIRouter(tags=["SKKU CScience posts"])
@@ -18,7 +20,7 @@ async def list_posts(
     limit: Annotated[
         int, Query(ge=1, le=constants.MAX_LIMIT)
     ] = constants.DEFAULT_LIMIT,
-) -> list[ArticlePostListItem]:
+) -> list[SkkuCscienceArticlePostListItem]:
     try:
         return await service.get_posts(offset=offset, limit=limit)
     except SkkuCrawlerError as exc:

@@ -8,18 +8,19 @@ from crawl_skku.article.cscience import constants
 from crawl_skku.article.cscience.schemas import (
     CscienceArticleKey,
     CscienceArticlePostDetail,
+    SkkuCscienceArticlePostListItem,
 )
-from crawl_skku.article.schemas import ArticleAttachment, ArticlePostListItem
+from crawl_skku.article.schemas import ArticleAttachment
 from crawl_skku.exceptions import SkkuParseError
 
 
-def parse_post_list(html: str) -> list[ArticlePostListItem]:
+def parse_post_list(html: str) -> list[SkkuCscienceArticlePostListItem]:
     soup = BeautifulSoup(html, "html.parser")
     list_container = soup.select_one(".board-list-wrap")
     if list_container is None:
         raise SkkuParseError("Could not find SKKU CScience post list")
 
-    items: list[ArticlePostListItem] = []
+    items: list[SkkuCscienceArticlePostListItem] = []
     for row in list_container.find_all("li", recursive=False):
         item = _parse_list_row(row)
         if item is not None:
@@ -68,7 +69,7 @@ def parse_post_detail(
     )
 
 
-def _parse_list_row(row: Tag) -> ArticlePostListItem | None:
+def _parse_list_row(row: Tag) -> SkkuCscienceArticlePostListItem | None:
     title_link = row.select_one(".board-list-content-title a[href*='itemId']")
     if title_link is None:
         return None
@@ -92,7 +93,7 @@ def _parse_list_row(row: Tag) -> ArticlePostListItem | None:
     post_date, date_index = _parse_date_from_info(info_texts)
     author = _parse_list_author(info_texts, date_index)
 
-    return ArticlePostListItem(
+    return SkkuCscienceArticlePostListItem(
         key=key,
         category=category,
         title=title,

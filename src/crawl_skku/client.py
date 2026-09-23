@@ -3,17 +3,16 @@
 from datetime import date
 from typing import Protocol
 
-from crawl_skku.article.cscience.schemas import CscienceArticlePostDetail
+from crawl_skku.article.cscience.schemas import (
+    CscienceArticlePostDetail,
+    SkkuCscienceArticlePostListItem,
+)
 from crawl_skku.article.cscience.service import CscienceArticlePostService
 from crawl_skku.article.cse.service import CseArticlePostService
 from crawl_skku.article.enc.service import EncArticlePostService
 from crawl_skku.article.ice.service import IceArticlePostService
 from crawl_skku.article.root.service import RootArticlePostService
-from crawl_skku.article.schemas import (
-    ArticlePostListItem,
-    SkkuArticlePostDetail,
-    SkkuArticlePostListItem,
-)
+from crawl_skku.article.schemas import SkkuArticlePostDetail, SkkuArticlePostListItem
 from crawl_skku.article.sco.service import ScoArticlePostService
 from crawl_skku.article.skb_swuniv.service import SkbSwunivArticlePostService
 from crawl_skku.article.sw.service import SwArticlePostService
@@ -50,7 +49,7 @@ class CrawlSkkuClient:
 
     async def get_posts(
         self, source: str, *, offset: int = 0, limit: int = 10
-    ) -> list[SkkuArticlePostListItem] | list[ArticlePostListItem]:
+    ) -> list[SkkuArticlePostListItem] | list[SkkuCscienceArticlePostListItem]:
         if source == "cscience":
             return await self._cscience_article_service.get_posts(
                 offset=offset, limit=limit

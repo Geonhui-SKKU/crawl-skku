@@ -1,8 +1,10 @@
 from crawl_skku import cache as skku_cache
 from crawl_skku import service as skku_service
 from crawl_skku.article.cscience import constants, utils
-from crawl_skku.article.cscience.schemas import CscienceArticlePostDetail
-from crawl_skku.article.schemas import ArticlePostListItem
+from crawl_skku.article.cscience.schemas import (
+    CscienceArticlePostDetail,
+    SkkuCscienceArticlePostListItem,
+)
 
 
 class CscienceArticlePostService:
@@ -10,14 +12,14 @@ class CscienceArticlePostService:
         self,
         offset: int = 0,
         limit: int = constants.DEFAULT_LIMIT,
-    ) -> list[ArticlePostListItem]:
+    ) -> list[SkkuCscienceArticlePostListItem]:
         settings = skku_cache.get_cache_settings()
         return await skku_cache.get_or_load(
             namespace=constants.BOARD_NAME,
             resource=skku_cache.CacheResource.POST_LIST,
             key={"offset": offset, "limit": limit},
             ttl_seconds=skku_cache.list_ttl(settings),
-            response_type=list[ArticlePostListItem],
+            response_type=list[SkkuCscienceArticlePostListItem],
             loader=lambda: self._load_posts(offset=offset, limit=limit),
             settings=settings,
         )
@@ -38,7 +40,7 @@ class CscienceArticlePostService:
         self,
         offset: int,
         limit: int,
-    ) -> list[ArticlePostListItem]:
+    ) -> list[SkkuCscienceArticlePostListItem]:
         html = await skku_service.fetch_html(
             constants.BOARD_BASE_URL,
             params={"article.offset": offset, "articleLimit": limit},

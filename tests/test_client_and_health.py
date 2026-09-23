@@ -36,6 +36,12 @@ class CrawlSkkuClientTests(unittest.IsolatedAsyncioTestCase):
         with self.assertRaisesRegex(ValueError, "Unsupported source"):
             await client.get_posts("unknown")
 
+    def test_new_college_sources_are_available(self) -> None:
+        client = CrawlSkkuClient()
+
+        self.assertIn("enc", client._article_services)
+        self.assertIn("ice", client._article_services)
+
 
 class HealthEndpointTests(unittest.IsolatedAsyncioTestCase):
     async def test_healthz_returns_ok(self) -> None:

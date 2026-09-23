@@ -4,6 +4,8 @@ from datetime import date
 from typing import Protocol
 
 from crawl_skku.article.cse.service import CseArticlePostService
+from crawl_skku.article.enc.service import EncArticlePostService
+from crawl_skku.article.ice.service import IceArticlePostService
 from crawl_skku.article.root.service import RootArticlePostService
 from crawl_skku.article.schemas import SkkuArticlePostDetail, SkkuArticlePostListItem
 from crawl_skku.article.sco.service import ScoArticlePostService
@@ -34,6 +36,8 @@ class CrawlSkkuClient:
             "skb_swuniv": SkbSwunivArticlePostService(),
             "cse": CseArticlePostService(),
             "sco": ScoArticlePostService(),
+            "enc": EncArticlePostService(),
+            "ice": IceArticlePostService(),
         }
         self._calendar_service = RootCalendarService()
 

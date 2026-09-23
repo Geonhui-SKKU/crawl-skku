@@ -4,6 +4,10 @@ from unittest.mock import AsyncMock, patch
 from crawl_skku import cache as skku_cache
 from crawl_skku.article.cse import constants as cse_constants
 from crawl_skku.article.cse.service import CseArticlePostService
+from crawl_skku.article.enc import constants as enc_constants
+from crawl_skku.article.enc.service import EncArticlePostService
+from crawl_skku.article.ice import constants as ice_constants
+from crawl_skku.article.ice.service import IceArticlePostService
 from crawl_skku.article.sco import constants as sco_constants
 from crawl_skku.article.sco.service import ScoArticlePostService
 from crawl_skku.article.skb_swuniv import constants as skb_constants
@@ -21,6 +25,46 @@ from tests.test_skku_article_sw_utils import LIST_HTML as SW_LIST_HTML
 
 
 class SkkuNewBoardServiceTests(unittest.IsolatedAsyncioTestCase):
+    async def test_enc_and_ice_services_use_source_specific_cache_namespaces(
+        self,
+    ) -> None:
+        for service_class, constants, service_path in (
+            (
+                EncArticlePostService,
+                enc_constants,
+                "crawl_skku.article.enc.service",
+            ),
+            (
+                IceArticlePostService,
+                ice_constants,
+                "crawl_skku.article.ice.service",
+            ),
+        ):
+            with self.subTest(source=constants.BOARD_NAME):
+                fetch_html = AsyncMock(return_value=CSE_LIST_HTML)
+                with (
+                    patch(f"{service_path}.skku_service.fetch_html", fetch_html),
+                    patch(f"{service_path}.skku_cache.get_or_load") as get_or_load,
+                ):
+
+                    async def passthrough(**kwargs):
+                        return await kwargs["loader"]()
+
+                    get_or_load.side_effect = passthrough
+                    items = await service_class().get_posts(offset=10, limit=5)
+
+                fetch_html.assert_awaited_once_with(
+                    constants.BOARD_BASE_URL,
+                    params={"article.offset": 10, "articleLimit": 5},
+                )
+                self.assertEqual(
+                    get_or_load.call_args.kwargs["namespace"], constants.BOARD_NAME
+                )
+                self.assertEqual(
+                    get_or_load.call_args.kwargs["key"], {"offset": 10, "limit": 5}
+                )
+                self.assertEqual(items[0].key.article_no, 218999)
+
     async def test_sw_list_uses_cache_namespace_and_offset_key(self) -> None:
         fetch_html = AsyncMock(return_value=SW_LIST_HTML)
 

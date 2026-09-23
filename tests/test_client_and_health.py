@@ -42,6 +42,17 @@ class CrawlSkkuClientTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn("enc", client._article_services)
         self.assertIn("ice", client._article_services)
 
+    async def test_cscience_list_source_uses_its_service(self) -> None:
+        client = CrawlSkkuClient()
+        client._cscience_article_service.get_posts = AsyncMock(return_value=[])  # type: ignore[method-assign]
+
+        await client.get_posts("cscience", offset=2, limit=3)
+
+        client._cscience_article_service.get_posts.assert_awaited_once_with(
+            offset=2,
+            limit=3,
+        )
+
 
 class HealthEndpointTests(unittest.IsolatedAsyncioTestCase):
     async def test_healthz_returns_ok(self) -> None:

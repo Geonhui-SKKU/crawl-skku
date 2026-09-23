@@ -6,7 +6,7 @@
 
 ## 지원 데이터
 
-- 성균관대학교, 소프트웨어융합대학, SW중심대학사업단, 컴퓨터교육과, 융합과학대학, 공과대학, 정보통신대학 공지사항
+- 성균관대학교, 소프트웨어융합대학, SW중심대학사업단, 컴퓨터교육과, 융합과학대학, 공과대학, 정보통신대학, 자연과학대학 공지사항
 - 성균관대학교 학사일정
 
 ## 설치
@@ -34,7 +34,7 @@ async def main() -> None:
 asyncio.run(main())
 ```
 
-지원 게시판 식별자는 `root`, `sw`, `skb_swuniv`, `cse`, `sco`, `enc`, `ice`입니다.
+지원 게시판 식별자는 `root`, `sw`, `skb_swuniv`, `cse`, `sco`, `enc`, `ice`, `cscience`입니다. 자연과학대학 게시글은 게시판 ID와 문자열 항목 ID를 함께 사용하므로, 상세 조회는 `get_cscience_post(board_id, item_id)`를 사용하세요.
 
 ## API 서버
 
@@ -47,6 +47,7 @@ uv run crawl-skku serve --host 127.0.0.1 --port 8000
 ```text
 GET /skku/article/{source}/posts?offset=0&limit=10
 GET /skku/article/{source}/posts/{article_no}
+GET /skku/article/cscience/posts/{board_id}/{item_id}
 GET /skku/calendar/root/month?year=2026&month=7
 GET /skku/calendar/root/days/{YYYY-MM-DD}
 GET /healthz

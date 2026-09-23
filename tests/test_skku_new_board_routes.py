@@ -15,6 +15,10 @@ class SkkuNewBoardRouteTests(unittest.TestCase):
         self.assertIn("/skku/article/cse/posts/{article_no}", paths)
         self.assertIn("/skku/article/sco/posts", paths)
         self.assertIn("/skku/article/sco/posts/{article_no}", paths)
+        self.assertIn("/skku/article/enc/posts", paths)
+        self.assertIn("/skku/article/enc/posts/{article_no}", paths)
+        self.assertIn("/skku/article/ice/posts", paths)
+        self.assertIn("/skku/article/ice/posts/{article_no}", paths)
 
     def test_openapi_article_routes_have_single_source_tag(self) -> None:
         paths = app.openapi()["paths"]
@@ -34,6 +38,14 @@ class SkkuNewBoardRouteTests(unittest.TestCase):
         self.assertEqual(
             paths["/skku/article/sco/posts"]["get"]["tags"],
             ["SKKU SCO posts"],
+        )
+        self.assertEqual(
+            paths["/skku/article/enc/posts"]["get"]["tags"],
+            ["SKKU ENC posts"],
+        )
+        self.assertEqual(
+            paths["/skku/article/ice/posts"]["get"]["tags"],
+            ["SKKU ICE posts"],
         )
 
 

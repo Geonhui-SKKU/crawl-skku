@@ -3,11 +3,17 @@
 from datetime import date
 from typing import Protocol
 
+from crawl_skku.article.cscience.schemas import CscienceArticlePostDetail
+from crawl_skku.article.cscience.service import CscienceArticlePostService
 from crawl_skku.article.cse.service import CseArticlePostService
 from crawl_skku.article.enc.service import EncArticlePostService
 from crawl_skku.article.ice.service import IceArticlePostService
 from crawl_skku.article.root.service import RootArticlePostService
-from crawl_skku.article.schemas import SkkuArticlePostDetail, SkkuArticlePostListItem
+from crawl_skku.article.schemas import (
+    ArticlePostListItem,
+    SkkuArticlePostDetail,
+    SkkuArticlePostListItem,
+)
 from crawl_skku.article.sco.service import ScoArticlePostService
 from crawl_skku.article.skb_swuniv.service import SkbSwunivArticlePostService
 from crawl_skku.article.sw.service import SwArticlePostService
@@ -39,15 +45,26 @@ class CrawlSkkuClient:
             "enc": EncArticlePostService(),
             "ice": IceArticlePostService(),
         }
+        self._cscience_article_service = CscienceArticlePostService()
         self._calendar_service = RootCalendarService()
 
     async def get_posts(
         self, source: str, *, offset: int = 0, limit: int = 10
-    ) -> list[SkkuArticlePostListItem]:
+    ) -> list[SkkuArticlePostListItem] | list[ArticlePostListItem]:
+        if source == "cscience":
+            return await self._cscience_article_service.get_posts(
+                offset=offset, limit=limit
+            )
         return await self._article_service(source).get_posts(offset=offset, limit=limit)
 
     async def get_post(self, source: str, article_no: int) -> SkkuArticlePostDetail:
         return await self._article_service(source).get_post(article_no)
+
+    async def get_cscience_post(
+        self, board_id: int, item_id: str
+    ) -> CscienceArticlePostDetail:
+        """Get a Natural Sciences College post by its source-specific key."""
+        return await self._cscience_article_service.get_post(board_id, item_id)
 
     async def get_calendar_month(self, year: int, month: int) -> SkkuCalendarMonth:
         return await self._calendar_service.get_month(year, month)

@@ -1,0 +1,10 @@
+from urllib.parse import urlencode
+
+BOARD_BASE_URL = "https://cscience.skku.edu/cscience/community/under_notice.do"
+BOARD_NAME = "crawl_skku.article.cscience"
+DEFAULT_LIMIT = 10
+MAX_LIMIT = 50
+
+
+def build_detail_url(board_id: int, item_id: str) -> str:
+    return f"{BOARD_BASE_URL}?{urlencode({'mode': 'view', 'viewBoardId': board_id, 'itemId': item_id})}"

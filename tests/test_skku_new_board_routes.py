@@ -13,6 +13,8 @@ class SkkuNewBoardRouteTests(unittest.TestCase):
         self.assertIn("/skku/article/skb_swuniv/posts/{article_no}", paths)
         self.assertIn("/skku/article/cse/posts", paths)
         self.assertIn("/skku/article/cse/posts/{article_no}", paths)
+        self.assertIn("/skku/article/cscience/posts", paths)
+        self.assertIn("/skku/article/cscience/posts/{board_id}/{item_id}", paths)
         self.assertIn("/skku/article/sco/posts", paths)
         self.assertIn("/skku/article/sco/posts/{article_no}", paths)
         self.assertIn("/skku/article/enc/posts", paths)
@@ -34,6 +36,10 @@ class SkkuNewBoardRouteTests(unittest.TestCase):
         self.assertEqual(
             paths["/skku/article/cse/posts"]["get"]["tags"],
             ["SKKU CSE posts"],
+        )
+        self.assertEqual(
+            paths["/skku/article/cscience/posts"]["get"]["tags"],
+            ["SKKU CScience posts"],
         )
         self.assertEqual(
             paths["/skku/article/sco/posts"]["get"]["tags"],

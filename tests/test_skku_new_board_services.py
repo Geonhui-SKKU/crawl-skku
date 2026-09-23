@@ -2,6 +2,8 @@ import unittest
 from unittest.mock import AsyncMock, patch
 
 from crawl_skku import cache as skku_cache
+from crawl_skku.article.cscience import constants as cscience_constants
+from crawl_skku.article.cscience.service import CscienceArticlePostService
 from crawl_skku.article.cse import constants as cse_constants
 from crawl_skku.article.cse.service import CseArticlePostService
 from crawl_skku.article.enc import constants as enc_constants
@@ -25,6 +27,49 @@ from tests.test_skku_article_sw_utils import LIST_HTML as SW_LIST_HTML
 
 
 class SkkuNewBoardServiceTests(unittest.IsolatedAsyncioTestCase):
+    async def test_cscience_detail_uses_source_specific_key(self) -> None:
+        fetch_html = AsyncMock(return_value="")
+
+        with (
+            patch(
+                "crawl_skku.article.cscience.service.skku_service.fetch_html",
+                fetch_html,
+            ),
+            patch(
+                "crawl_skku.article.cscience.service.skku_cache.get_or_load"
+            ) as get_or_load,
+        ):
+
+            async def passthrough(**kwargs):
+                return await kwargs["loader"]()
+
+            get_or_load.side_effect = passthrough
+            with patch(
+                "crawl_skku.article.cscience.service.utils.parse_post_detail"
+            ) as parse_post_detail:
+                await CscienceArticlePostService().get_post(
+                    board_id=138879,
+                    item_id="opaque-item-id",
+                )
+
+        fetch_html.assert_awaited_once_with(
+            cscience_constants.BOARD_BASE_URL,
+            params={
+                "mode": "view",
+                "viewBoardId": 138879,
+                "itemId": "opaque-item-id",
+            },
+        )
+        self.assertEqual(
+            get_or_load.call_args.kwargs["key"],
+            {"board_id": 138879, "item_id": "opaque-item-id"},
+        )
+        parse_post_detail.assert_called_once_with(
+            "",
+            board_id=138879,
+            item_id="opaque-item-id",
+        )
+
     async def test_enc_and_ice_services_use_source_specific_cache_namespaces(
         self,
     ) -> None:

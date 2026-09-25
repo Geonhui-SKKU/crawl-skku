@@ -35,13 +35,13 @@ class CrawlSkkuClient:
     """
 
     def __init__(self) -> None:
+        self._enc_article_service = EncArticlePostService()
         self._article_services: dict[str, _ArticlePostService] = {
             "root": RootArticlePostService(),
             "sw": SwArticlePostService(),
             "skb_swuniv": SkbSwunivArticlePostService(),
             "cse": CseArticlePostService(),
             "sco": ScoArticlePostService(),
-            "enc": EncArticlePostService(),
             "ice": IceArticlePostService(),
         }
         self._cscience_article_service = CscienceArticlePostService()
@@ -54,9 +54,15 @@ class CrawlSkkuClient:
             return await self._cscience_article_service.get_posts(
                 offset=offset, limit=limit
             )
+        if source == "enc":
+            return await self._enc_article_service.get_posts(offset=offset, limit=limit)
         return await self._article_service(source).get_posts(offset=offset, limit=limit)
 
     async def get_post(self, source: str, article_no: int) -> SkkuArticlePostDetail:
+        if source == "enc":
+            raise ValueError(
+                "ENC posts require board_id and item_id; use get_enc_post(...)"
+            )
         return await self._article_service(source).get_post(article_no)
 
     async def get_cscience_post(
@@ -64,6 +70,14 @@ class CrawlSkkuClient:
     ) -> CscienceArticlePostDetail:
         """Get a Natural Sciences College post by its source-specific key."""
         return await self._cscience_article_service.get_post(board_id, item_id)
+
+    async def get_enc_post(
+        self, article_no: int, board_id: int, item_id: str
+    ) -> SkkuArticlePostDetail:
+        """Get an Engineering College post by its current upstream identifiers."""
+        return await self._enc_article_service.get_item_post(
+            article_no, board_id, item_id
+        )
 
     async def get_calendar_month(self, year: int, month: int) -> SkkuCalendarMonth:
         return await self._calendar_service.get_month(year, month)

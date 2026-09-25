@@ -1,3 +1,4 @@
+import re
 from datetime import date
 from urllib.parse import parse_qs, urlparse
 
@@ -32,7 +33,9 @@ def parse_post_list(html: str) -> list[SkkuArticlePostListItem]:
     return items
 
 
-def parse_post_detail(html: str, article_no: int) -> SkkuArticlePostDetail:
+def parse_post_detail(
+    html: str, article_no: int, board_id: int | None = None, item_id: str | None = None
+) -> SkkuArticlePostDetail:
     soup = BeautifulSoup(html, "html.parser")
     box = soup.select_one(".board-view-box")
     if box is None:
@@ -50,16 +53,20 @@ def parse_post_detail(html: str, article_no: int) -> SkkuArticlePostDetail:
     attachments = _parse_attachments(box)
     description = _parse_description(box)
 
+    key_fields = (
+        {"board_id": board_id, "item_id": item_id} if board_id and item_id else {}
+    )
     return SkkuArticlePostDetail(
-        key=SkkuArticleKey(
-            type="skku_article",
-            article_no=article_no,
-        ),
+        key=SkkuArticleKey(type="skku_article", article_no=article_no, **key_fields),
         category=category,
         title=title,
         date=post_date,
         author=author,
-        url=constants.build_detail_url(article_no),
+        url=(
+            constants.build_item_detail_url(board_id, item_id)
+            if board_id and item_id
+            else constants.build_detail_url(article_no)
+        ),
         has_attachment=bool(attachments),
         description=description,
         attachments=attachments or None,
@@ -67,7 +74,10 @@ def parse_post_detail(html: str, article_no: int) -> SkkuArticlePostDetail:
 
 
 def _parse_list_row(row: Tag) -> SkkuArticlePostListItem | None:
-    title_link = row.select_one(".board-list-content-title a[href*='articleNo']")
+    title_link = row.select_one(
+        ".board-list-content-title a[href*='articleNo'], "
+        ".board-list-content-title a[href*='itemId']"
+    )
     if title_link is None:
         return None
 
@@ -75,7 +85,8 @@ def _parse_list_row(row: Tag) -> SkkuArticlePostListItem | None:
     if not isinstance(href, str):
         return None
 
-    article_no = _parse_article_no(href)
+    info_texts = _parse_list_info_texts(row)
+    article_no = _parse_article_no(href, info_texts)
     if article_no is None:
         return None
 
@@ -86,15 +97,23 @@ def _parse_list_row(row: Tag) -> SkkuArticlePostListItem | None:
     category = article_utils.strip_brackets(
         _tag_text(row.select_one(".c-board-list-category"))
     )
-    info_texts = _parse_list_info_texts(row)
+    query = parse_qs(urlparse(href).query)
+    board_ids = query.get("viewBoardId")
+    item_ids = query.get("itemId")
+    key_fields: dict[str, int | str] = {}
+    if board_ids and item_ids and item_ids[0]:
+        try:
+            board_id = int(board_ids[0])
+        except ValueError:
+            return None
+        if board_id < 1:
+            return None
+        key_fields = {"board_id": board_id, "item_id": item_ids[0]}
     post_date, date_index = _parse_date_from_info(info_texts)
     author = _parse_list_author(info_texts, date_index)
 
     return SkkuArticlePostListItem(
-        key=SkkuArticleKey(
-            type="skku_article",
-            article_no=article_no,
-        ),
+        key=SkkuArticleKey(type="skku_article", article_no=article_no, **key_fields),
         category=category,
         title=title,
         date=post_date,
@@ -104,15 +123,19 @@ def _parse_list_row(row: Tag) -> SkkuArticlePostListItem | None:
     )
 
 
-def _parse_article_no(href: str) -> int | None:
+def _parse_article_no(href: str, info_texts: list[str]) -> int | None:
     values = parse_qs(urlparse(href).query).get("articleNo")
-    if not values:
-        return None
+    if values:
+        try:
+            return int(values[0])
+        except ValueError:
+            return None
 
-    try:
-        return int(values[0])
-    except ValueError:
-        return None
+    for text in info_texts:
+        match = re.fullmatch(r"No\.\s*(\d+)", text)
+        if match:
+            return int(match.group(1))
+    return None
 
 
 def _parse_list_info_texts(row: Tag) -> list[str]:
@@ -203,7 +226,7 @@ def _row_has_attachment(row: Tag) -> bool:
 
 def _parse_attachments(box: Tag) -> list[ArticleAttachment]:
     attachments: list[ArticleAttachment] = []
-    for link in box.select(".board-view-file-wrap a[href*='mode=download']"):
+    for link in box.select(".board-view-file-wrap a[href]"):
         href = link.get("href")
         if not isinstance(href, str):
             continue

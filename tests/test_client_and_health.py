@@ -39,8 +39,34 @@ class CrawlSkkuClientTests(unittest.IsolatedAsyncioTestCase):
     def test_new_college_sources_are_available(self) -> None:
         client = CrawlSkkuClient()
 
-        self.assertIn("enc", client._article_services)
+        self.assertIsNotNone(client._enc_article_service)
         self.assertIn("ice", client._article_services)
+
+    async def test_enc_list_source_uses_its_service(self) -> None:
+        client = CrawlSkkuClient()
+        client._enc_article_service.get_posts = AsyncMock(return_value=[])  # type: ignore[method-assign]
+
+        await client.get_posts("enc", offset=2, limit=3)
+
+        client._enc_article_service.get_posts.assert_awaited_once_with(  # type: ignore[attr-defined]
+            offset=2, limit=3
+        )
+
+    async def test_enc_numeric_only_detail_is_rejected(self) -> None:
+        client = CrawlSkkuClient()
+
+        with self.assertRaisesRegex(ValueError, "use get_enc_post"):
+            await client.get_post("enc", 1717)
+
+    async def test_enc_detail_uses_current_identifiers(self) -> None:
+        client = CrawlSkkuClient()
+        client._enc_article_service.get_item_post = AsyncMock()  # type: ignore[method-assign]
+
+        await client.get_enc_post(1717, 138885, "ABC123")
+
+        client._enc_article_service.get_item_post.assert_awaited_once_with(  # type: ignore[attr-defined]
+            1717, 138885, "ABC123"
+        )
 
     async def test_cscience_list_source_uses_its_service(self) -> None:
         client = CrawlSkkuClient()

@@ -21,15 +21,17 @@ class EncArticlePostService:
             settings=settings,
         )
 
-    async def get_post(self, article_no: int) -> SkkuArticlePostDetail:
+    async def get_item_post(
+        self, article_no: int, board_id: int, item_id: str
+    ) -> SkkuArticlePostDetail:
         settings = skku_cache.get_cache_settings()
         return await skku_cache.get_or_load(
             namespace=constants.BOARD_NAME,
             resource=skku_cache.CacheResource.POST_DETAIL,
-            key={"article_no": article_no},
+            key={"article_no": article_no, "board_id": board_id, "item_id": item_id},
             ttl_seconds=skku_cache.detail_ttl(settings),
             response_type=SkkuArticlePostDetail,
-            loader=lambda: self._load_post(article_no=article_no),
+            loader=lambda: self._load_item_post(article_no, board_id, item_id),
             settings=settings,
         )
 
@@ -44,9 +46,11 @@ class EncArticlePostService:
         )
         return utils.parse_post_list(html)[:limit]
 
-    async def _load_post(self, article_no: int) -> SkkuArticlePostDetail:
+    async def _load_item_post(
+        self, article_no: int, board_id: int, item_id: str
+    ) -> SkkuArticlePostDetail:
         html = await skku_service.fetch_html(
             constants.BOARD_BASE_URL,
-            params={"mode": "view", "articleNo": article_no},
+            params={"mode": "view", "viewBoardId": board_id, "itemId": item_id},
         )
-        return utils.parse_post_detail(html, article_no=article_no)
+        return utils.parse_post_detail(html, article_no, board_id, item_id)

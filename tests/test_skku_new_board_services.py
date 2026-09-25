@@ -27,6 +27,34 @@ from tests.test_skku_article_sw_utils import LIST_HTML as SW_LIST_HTML
 
 
 class SkkuNewBoardServiceTests(unittest.IsolatedAsyncioTestCase):
+    async def test_enc_current_detail_uses_item_identifiers(self) -> None:
+        fetch_html = AsyncMock(return_value="")
+        with (
+            patch("crawl_skku.article.enc.service.skku_service.fetch_html", fetch_html),
+            patch(
+                "crawl_skku.article.enc.service.skku_cache.get_or_load"
+            ) as get_or_load,
+        ):
+
+            async def passthrough(**kwargs):
+                return await kwargs["loader"]()
+
+            get_or_load.side_effect = passthrough
+            with patch(
+                "crawl_skku.article.enc.service.utils.parse_post_detail"
+            ) as parse_post_detail:
+                await EncArticlePostService().get_item_post(1717, 138885, "ABC123")
+
+        fetch_html.assert_awaited_once_with(
+            enc_constants.BOARD_BASE_URL,
+            params={"mode": "view", "viewBoardId": 138885, "itemId": "ABC123"},
+        )
+        self.assertEqual(
+            get_or_load.call_args.kwargs["key"],
+            {"article_no": 1717, "board_id": 138885, "item_id": "ABC123"},
+        )
+        parse_post_detail.assert_called_once_with("", 1717, 138885, "ABC123")
+
     async def test_cscience_detail_uses_source_specific_key(self) -> None:
         fetch_html = AsyncMock(return_value="")
 

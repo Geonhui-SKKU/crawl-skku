@@ -34,7 +34,7 @@ async def main() -> None:
 asyncio.run(main())
 ```
 
-지원 게시판 식별자는 `root`, `sw`, `skb_swuniv`, `cse`, `sco`, `enc`, `ice`, `cscience`입니다. 자연과학대학 게시글은 게시판 ID와 문자열 항목 ID를 함께 사용하므로, 상세 조회는 `get_cscience_post(board_id, item_id)`를 사용하세요.
+지원 게시판 식별자는 `root`, `sw`, `skb_swuniv`, `cse`, `sco`, `enc`, `ice`, `cscience`입니다. 자연과학대학 게시글은 게시판 ID와 문자열 항목 ID를 함께 사용하므로, 상세 조회는 `get_cscience_post(board_id, item_id)`를 사용하세요. 공과대학의 현재 목록은 `key.article_no`에 화면의 `No.` 번호를, `key.board_id`와 `key.item_id`에 상세 조회 식별자를 담습니다. 화면 번호는 새 글이 등록되면 바뀔 수 있으므로 상세 조회에는 목록에서 받은 세 값을 `get_enc_post(article_no, board_id, item_id)`에 전달하세요.
 
 ## API 서버
 
@@ -46,7 +46,8 @@ uv run crawl-skku serve --host 127.0.0.1 --port 8000
 
 ```text
 GET /skku/article/{source}/posts?offset=0&limit=10
-GET /skku/article/{source}/posts/{article_no}
+GET /skku/article/{source}/posts/{article_no}  # enc, cscience 제외
+GET /skku/article/enc/posts/{article_no}/{board_id}/{item_id}
 GET /skku/article/cscience/posts/{board_id}/{item_id}
 GET /skku/calendar/root/month?year=2026&month=7
 GET /skku/calendar/root/days/{YYYY-MM-DD}

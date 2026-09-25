@@ -1,6 +1,6 @@
 [project]
 name = "crawl-skku"
-version = "0.1.0"
+version = "0.1.1"
 description = "Normalized public SKKU board and academic calendar data."
 authors = [{ name = "Geonhui Lee", email = "skku@geonhui.com" }]
 readme = "README.md"

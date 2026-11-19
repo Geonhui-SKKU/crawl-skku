@@ -2,6 +2,7 @@
 
 from datetime import date
 
+from crawl_skku.article import aiuniv
 from crawl_skku.article.board_service import NumberedArticleBoard
 from crawl_skku.article.college_sources import (
     INTEGRATED_COLLEGE_BOARDS,
@@ -24,7 +25,6 @@ from crawl_skku.article.schemas import (
     SkkuIntegratedArticlePostListItem,
 )
 from crawl_skku.article.sco.service import ScoArticlePostService
-from crawl_skku.article.skb_swuniv.service import SkbSwunivArticlePostService
 from crawl_skku.article.sw.service import SwArticlePostService
 from crawl_skku.calendar.root.service import RootCalendarService
 from crawl_skku.calendar.schemas import SkkuCalendarDay, SkkuCalendarMonth
@@ -41,7 +41,7 @@ class CrawlSkkuClient:
         self._article_services: dict[str, NumberedArticleBoard] = {
             "root": RootArticlePostService(),
             "sw": SwArticlePostService(),
-            "skb_swuniv": SkbSwunivArticlePostService(),
+            aiuniv.SOURCE: aiuniv.board,
             "cse": CseArticlePostService(),
             "sco": ScoArticlePostService(),
             "ice": IceArticlePostService(),
@@ -117,6 +117,8 @@ class CrawlSkkuClient:
         return await self._calendar_service.get_day(day)
 
     def _article_service(self, source: str) -> NumberedArticleBoard:
+        if source == aiuniv.LEGACY_SOURCE:
+            source = aiuniv.SOURCE
         try:
             return self._article_services[source]
         except KeyError as exc:

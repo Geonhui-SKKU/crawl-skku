@@ -6,7 +6,7 @@ DETAIL_SUMMARY = "공지사항 상세 조회"
 SOURCE_NAMES = {
     "root": "",
     "sw": "소프트웨어융합대학",
-    "skb_swuniv": "SW중심대학사업단",
+    "aiuniv": "AI중심대학사업단",
     "cse": "소프트웨어학과",
     "sco": "글로벌융합학부",
     "enc": "공과대학",

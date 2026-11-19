@@ -16,4 +16,4 @@ body:
   - type: input
     attributes:
       label: Affected source
-      placeholder: root, sw, skb_swuniv, cse, or sco
+      placeholder: root, sw, aiuniv, cse, or sco

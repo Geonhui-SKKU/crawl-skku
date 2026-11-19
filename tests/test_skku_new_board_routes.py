@@ -15,8 +15,10 @@ class SkkuNewBoardRouteTests(unittest.TestCase):
 
         self.assertIn("/skku/article/sw/posts", paths)
         self.assertIn("/skku/article/sw/posts/{article_no}", paths)
-        self.assertIn("/skku/article/skb_swuniv/posts", paths)
-        self.assertIn("/skku/article/skb_swuniv/posts/{article_no}", paths)
+        self.assertIn("/skku/article/aiuniv/posts", paths)
+        self.assertIn("/skku/article/aiuniv/posts/{article_no}", paths)
+        self.assertNotIn("/skku/article/skb_swuniv/posts", paths)
+        self.assertNotIn("/skku/article/skb_swuniv/posts/{article_no}", paths)
         self.assertIn("/skku/article/cse/posts", paths)
         self.assertIn("/skku/article/cse/posts/{article_no}", paths)
         self.assertIn("/skku/article/cscience/posts", paths)
@@ -39,8 +41,8 @@ class SkkuNewBoardRouteTests(unittest.TestCase):
             ["성균관대학교 소프트웨어융합대학 공지사항"],
         )
         self.assertEqual(
-            paths["/skku/article/skb_swuniv/posts"]["get"]["tags"],
-            ["성균관대학교 SW중심대학사업단 공지사항"],
+            paths["/skku/article/aiuniv/posts"]["get"]["tags"],
+            ["성균관대학교 AI중심대학사업단 공지사항"],
         )
         self.assertEqual(
             paths["/skku/article/cse/posts"]["get"]["tags"],

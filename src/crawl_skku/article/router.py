@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 
+from crawl_skku.article import aiuniv
 from crawl_skku.article.college_router import integrated_router, numbered_router
 from crawl_skku.article.college_sources import (
     INTEGRATED_COLLEGE_BOARDS,
@@ -12,13 +13,16 @@ from crawl_skku.article.enc.router import router as enc_router
 from crawl_skku.article.ice.router import router as ice_router
 from crawl_skku.article.root.router import router as root_router
 from crawl_skku.article.sco.router import router as sco_router
-from crawl_skku.article.skb_swuniv.router import router as skb_swuniv_router
 from crawl_skku.article.sw.router import router as sw_router
 
 router = APIRouter()
 router.include_router(root_router, prefix="/root")
 router.include_router(sw_router, prefix="/sw")
-router.include_router(skb_swuniv_router, prefix="/skb_swuniv")
+aiuniv_router = numbered_router(aiuniv.SOURCE, aiuniv.board)
+router.include_router(aiuniv_router, prefix=f"/{aiuniv.SOURCE}")
+router.include_router(
+    aiuniv_router, prefix=f"/{aiuniv.LEGACY_SOURCE}", include_in_schema=False
+)
 router.include_router(cse_router, prefix="/cse")
 router.include_router(cscience_router, prefix="/cscience")
 router.include_router(sco_router, prefix="/sco")

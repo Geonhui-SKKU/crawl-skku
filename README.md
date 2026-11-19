@@ -39,12 +39,14 @@ asyncio.run(main())
 
 | 상세 조회 | 게시판 식별자 |
 | --- | --- |
-| `get_post(source, article_no)` | `root` 성균관대학교, `sw` 소프트웨어융합대학, `skb_swuniv` SW중심대학사업단, `cse` 소프트웨어학과, `sco` 글로벌융합학부, `ice` 정보통신대학, `ecostat` 경제대학, `biz` 경영대학, `pharm` 약학대학 및 아래 학과별 식별자 |
+| `get_post(source, article_no)` | `root` 성균관대학교, `sw` 소프트웨어융합대학, `aiuniv` AI중심대학사업단, `cse` 소프트웨어학과, `sco` 글로벌융합학부, `ice` 정보통신대학, `ecostat` 경제대학, `biz` 경영대학, `pharm` 약학대학 및 아래 학과별 식별자 |
 | `get_integrated_post(source, board_id, item_id)` | `hakbu` 학부대학, `scos` 유학대학, `liberalarts` 문과대학, `sscience` 사회과학대학, `coe` 사범대학, `art` 예술대학, `biotech` 생명공학대학, `sport` 스포츠과학대학, `ics` 성균융합원 |
 | `get_cscience_post(board_id, item_id)` | `cscience` 자연과학대학 |
 | `get_enc_post(article_no, board_id, item_id)` | `enc` 공과대학 |
 
 목록에서 받은 `key`의 값을 상세 조회에 전달하세요. 통합게시판에는 학부와 대학원 메뉴가 나뉜 경우 학부 공지사항을 사용하며, 화면의 `No.` 대신 실제 상세 조회에 쓰이는 `board_id`와 `item_id`를 반환합니다. 공과대학의 `key.article_no`는 기존 API와 동일하게 화면의 `No.`를 담으므로 새 글이 등록되면 바뀔 수 있습니다. 성균융합원은 현재 운영 중인 `ics.skku.edu` 공지사항을 사용합니다.
+
+SW중심대학사업단 공지는 [AI중심대학사업단 공지](https://aiuniv.skku.edu/aiuniv/notice.do)로 대체되었습니다. 새 식별자는 `aiuniv`입니다. 이전 `skb_swuniv` 식별자와 API 경로도 호환을 위해 동작하지만, 두 경로 모두 새 게시판을 조회합니다. 상세 조회에는 새 목록에서 받은 `article_no`를 사용하세요.
 
 ### 학과별 공지사항
 

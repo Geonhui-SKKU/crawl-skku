@@ -20,7 +20,7 @@ router -> source service -> SQLite cache -> upstream fetch -> source parser -> P
 
 Calendar data uses the same pattern. Source-specific code belongs under `src/crawl_skku/article/{source}/` or `src/crawl_skku/calendar/{source}/`; keep URLs, selectors, and board numbers local to that source.
 
-Supported article source identifiers are `root`, `sw`, `skb_swuniv`, `cse`, and `sco`. Preserve the existing `/skku/...` HTTP paths, `key.type == "skku_article"`, nested `key.article_no`, offset pagination, and inclusive calendar end dates unless an explicit API-versioning change is requested.
+See the README for supported article source identifiers and detail key shapes. Preserve existing `/skku/...` HTTP paths, `key.type == "skku_article"` where used, nested `key.article_no` for numbered posts, offset pagination, and inclusive calendar end dates unless an explicit API-versioning change is requested.
 
 `CrawlSkkuClient` is the public high-level Python API. Parsers and source-specific services are internal implementation details.
 

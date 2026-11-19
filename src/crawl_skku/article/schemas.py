@@ -19,6 +19,12 @@ class SkkuArticleKey(ArticlePostKey):
     article_no: int = Field(ge=1)
 
 
+class SkkuIntegratedArticleKey(ArticlePostKey):
+    type: Literal["skku_article"]
+    board_id: int = Field(ge=1)
+    item_id: str = Field(min_length=1)
+
+
 class ArticlePostBase(BaseModel):
     category: str | None = None
     title: str = Field(min_length=1)
@@ -42,5 +48,14 @@ class SkkuArticlePostListItem(ArticlePostBase):
 
 
 class SkkuArticlePostDetail(SkkuArticlePostListItem):
+    description: str
+    attachments: list[ArticleAttachment] | None = None
+
+
+class SkkuIntegratedArticlePostListItem(ArticlePostBase):
+    key: SkkuIntegratedArticleKey
+
+
+class SkkuIntegratedArticlePostDetail(SkkuIntegratedArticlePostListItem):
     description: str
     attachments: list[ArticleAttachment] | None = None

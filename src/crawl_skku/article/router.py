@@ -1,5 +1,10 @@
 from fastapi import APIRouter
 
+from crawl_skku.article.college_router import integrated_router, numbered_router
+from crawl_skku.article.college_sources import (
+    INTEGRATED_COLLEGE_BOARDS,
+    NUMBERED_COLLEGE_BOARDS,
+)
 from crawl_skku.article.cscience.router import router as cscience_router
 from crawl_skku.article.cse.router import router as cse_router
 from crawl_skku.article.enc.router import router as enc_router
@@ -18,3 +23,10 @@ router.include_router(cscience_router, prefix="/cscience")
 router.include_router(sco_router, prefix="/sco")
 router.include_router(enc_router, prefix="/enc")
 router.include_router(ice_router, prefix="/ice")
+
+for source, numbered_board in NUMBERED_COLLEGE_BOARDS.items():
+    router.include_router(numbered_router(source, numbered_board), prefix=f"/{source}")
+for source, integrated_board in INTEGRATED_COLLEGE_BOARDS.items():
+    router.include_router(
+        integrated_router(source, integrated_board), prefix=f"/{source}"
+    )

@@ -4,13 +4,14 @@ from fastapi import APIRouter, HTTPException, Path, Query, status
 
 from crawl_skku.article.enc import constants
 from crawl_skku.article.enc.dependencies import EncArticlePostServiceDep
+from crawl_skku.article.metadata import DETAIL_SUMMARY, LIST_SUMMARY, notice_tag
 from crawl_skku.article.schemas import SkkuArticlePostDetail, SkkuArticlePostListItem
 from crawl_skku.exceptions import SkkuCrawlerError
 
-router = APIRouter(tags=["SKKU ENC posts"])
+router = APIRouter(tags=[notice_tag("enc")])
 
 
-@router.get("/posts", summary="List SKKU ENC posts")
+@router.get("/posts", summary=LIST_SUMMARY)
 async def list_posts(
     service: EncArticlePostServiceDep,
     offset: Annotated[int, Query(ge=0)] = 0,
@@ -26,7 +27,7 @@ async def list_posts(
 
 @router.get(
     "/posts/{article_no}/{board_id}/{item_id}",
-    summary="Get an SKKU ENC post by its current upstream identifiers",
+    summary=DETAIL_SUMMARY,
 )
 async def get_item_post(
     service: EncArticlePostServiceDep,

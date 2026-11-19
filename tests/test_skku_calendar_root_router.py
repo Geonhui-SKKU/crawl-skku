@@ -147,11 +147,11 @@ class SkkuCalendarRootRouterTests(unittest.IsolatedAsyncioTestCase):
 
         self.assertEqual(
             paths["/skku/calendar/root/month"]["get"]["tags"],
-            ["SKKU root calendar"],
+            ["성균관대학교 학사일정"],
         )
         self.assertEqual(
             paths["/skku/calendar/root/days/{date}"]["get"]["tags"],
-            ["SKKU root calendar"],
+            ["성균관대학교 학사일정"],
         )
 
 

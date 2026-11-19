@@ -14,8 +14,11 @@
 Python 3.11 이상과 [uv](https://docs.astral.sh/uv/)가 필요합니다.
 
 ```bash
-uv sync --locked
+make install
+make env  # 선택: .env가 없으면 .env.example을 복사
 ```
+
+`make` 없이 설치하려면 `uv sync --locked`를 실행하세요.
 
 ## Python 사용
 
@@ -36,7 +39,7 @@ asyncio.run(main())
 
 | 상세 조회 | 게시판 식별자 |
 | --- | --- |
-| `get_post(source, article_no)` | `root` 성균관대학교, `sw` 소프트웨어융합대학, `skb_swuniv` SW중심대학사업단, `cse` 소프트웨어학과, `sco` 융합과학대학, `ice` 정보통신대학, `ecostat` 경제대학, `biz` 경영대학, `pharm` 약학대학 및 아래 학과별 식별자 |
+| `get_post(source, article_no)` | `root` 성균관대학교, `sw` 소프트웨어융합대학, `skb_swuniv` SW중심대학사업단, `cse` 소프트웨어학과, `sco` 글로벌융합학부, `ice` 정보통신대학, `ecostat` 경제대학, `biz` 경영대학, `pharm` 약학대학 및 아래 학과별 식별자 |
 | `get_integrated_post(source, board_id, item_id)` | `hakbu` 학부대학, `scos` 유학대학, `liberalarts` 문과대학, `sscience` 사회과학대학, `coe` 사범대학, `art` 예술대학, `biotech` 생명공학대학, `sport` 스포츠과학대학, `ics` 성균융합원 |
 | `get_cscience_post(board_id, item_id)` | `cscience` 자연과학대학 |
 | `get_enc_post(article_no, board_id, item_id)` | `enc` 공과대학 |
@@ -67,8 +70,10 @@ asyncio.run(main())
 ## API 서버
 
 ```bash
-uv run crawl-skku serve --host 127.0.0.1 --port 8000
+make start
 ```
+
+자동 재시작이 필요한 개발 환경에서는 `make dev`를 사용하세요. 기본 주소는 `127.0.0.1:8000`이며, `make start HOST=0.0.0.0 PORT=8080`처럼 바꿀 수 있습니다. `make` 없이 실행하려면 `uv run --locked crawl-skku serve --host 127.0.0.1 --port 8000`을 사용하세요.
 
 문서는 `http://127.0.0.1:8000/docs`에서 확인할 수 있습니다. API 경로는 다음과 같습니다.
 
@@ -103,11 +108,12 @@ docker run --rm -p 8000:8000 -v crawl-skku-data:/data crawl-skku
 ## 개발
 
 ```bash
-uv run ruff format --check .
-uv run ruff check .
-uv run mypy src
-uv run python -m unittest discover -s tests -v
+make check  # 포맷 검사, 린트, 타입 검사, 테스트
+make test   # 테스트만 실행
+make format # 포맷 적용
 ```
+
+전체 명령은 `make help`에서 확인할 수 있습니다.
 
 ## 라이선스
 

@@ -2,17 +2,18 @@ from typing import Annotated
 
 from fastapi import APIRouter, HTTPException, Path, Query, status
 
+from crawl_skku.article.metadata import DETAIL_SUMMARY, LIST_SUMMARY, notice_tag
 from crawl_skku.article.schemas import SkkuArticlePostDetail, SkkuArticlePostListItem
 from crawl_skku.article.skb_swuniv import constants
 from crawl_skku.article.skb_swuniv.dependencies import SkbSwunivArticlePostServiceDep
 from crawl_skku.exceptions import SkkuCrawlerError
 
-router = APIRouter(tags=["SKKU SKB SWUNIV posts"])
+router = APIRouter(tags=[notice_tag("skb_swuniv")])
 
 
 @router.get(
     "/posts",
-    summary="List SKKU SKB SWUNIV posts",
+    summary=LIST_SUMMARY,
 )
 async def list_posts(
     service: SkbSwunivArticlePostServiceDep,
@@ -29,7 +30,7 @@ async def list_posts(
 
 @router.get(
     "/posts/{article_no}",
-    summary="Get an SKKU SKB SWUNIV post",
+    summary=DETAIL_SUMMARY,
 )
 async def get_post(
     service: SkbSwunivArticlePostServiceDep,

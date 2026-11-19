@@ -8,6 +8,7 @@ from crawl_skku.article.board_service import (
     NumberedArticleBoard,
 )
 from crawl_skku.article.cms import IntegratedCmsBoard
+from crawl_skku.article.metadata import DETAIL_SUMMARY, LIST_SUMMARY, notice_tag
 from crawl_skku.article.schemas import (
     SkkuArticlePostDetail,
     SkkuArticlePostListItem,
@@ -22,10 +23,9 @@ PositiveId = Annotated[int, Path(ge=1)]
 
 
 def numbered_router(source: str, board: NumberedArticleBoard) -> APIRouter:
-    label = f"SKKU {source.upper()}"
-    router = APIRouter(tags=[f"{label} posts"])
+    router = APIRouter(tags=[notice_tag(source)])
 
-    @router.get("/posts", summary=f"List {label} posts")
+    @router.get("/posts", summary=LIST_SUMMARY)
     async def list_posts(
         offset: Offset = 0, limit: Limit = DEFAULT_LIMIT
     ) -> list[SkkuArticlePostListItem]:
@@ -34,7 +34,7 @@ def numbered_router(source: str, board: NumberedArticleBoard) -> APIRouter:
         except SkkuCrawlerError as exc:
             raise _bad_gateway(exc) from exc
 
-    @router.get("/posts/{article_no}", summary=f"Get a {label} post")
+    @router.get("/posts/{article_no}", summary=DETAIL_SUMMARY)
     async def get_post(article_no: PositiveId) -> SkkuArticlePostDetail:
         try:
             return await board.get_post(article_no)
@@ -45,10 +45,9 @@ def numbered_router(source: str, board: NumberedArticleBoard) -> APIRouter:
 
 
 def integrated_router(source: str, board: IntegratedCmsBoard) -> APIRouter:
-    label = f"SKKU {source.upper()}"
-    router = APIRouter(tags=[f"{label} posts"])
+    router = APIRouter(tags=[notice_tag(source)])
 
-    @router.get("/posts", summary=f"List {label} posts")
+    @router.get("/posts", summary=LIST_SUMMARY)
     async def list_posts(
         offset: Offset = 0, limit: Limit = DEFAULT_LIMIT
     ) -> list[SkkuIntegratedArticlePostListItem]:
@@ -57,7 +56,7 @@ def integrated_router(source: str, board: IntegratedCmsBoard) -> APIRouter:
         except SkkuCrawlerError as exc:
             raise _bad_gateway(exc) from exc
 
-    @router.get("/posts/{board_id}/{item_id}", summary=f"Get a {label} post")
+    @router.get("/posts/{board_id}/{item_id}", summary=DETAIL_SUMMARY)
     async def get_post(
         board_id: PositiveId, item_id: Annotated[str, Path(min_length=1)]
     ) -> SkkuIntegratedArticlePostDetail:

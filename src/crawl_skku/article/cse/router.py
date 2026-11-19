@@ -4,15 +4,16 @@ from fastapi import APIRouter, HTTPException, Path, Query, status
 
 from crawl_skku.article.cse import constants
 from crawl_skku.article.cse.dependencies import CseArticlePostServiceDep
+from crawl_skku.article.metadata import DETAIL_SUMMARY, LIST_SUMMARY, notice_tag
 from crawl_skku.article.schemas import SkkuArticlePostDetail, SkkuArticlePostListItem
 from crawl_skku.exceptions import SkkuCrawlerError
 
-router = APIRouter(tags=["SKKU CSE posts"])
+router = APIRouter(tags=[notice_tag("cse")])
 
 
 @router.get(
     "/posts",
-    summary="List SKKU CSE posts",
+    summary=LIST_SUMMARY,
 )
 async def list_posts(
     service: CseArticlePostServiceDep,
@@ -29,7 +30,7 @@ async def list_posts(
 
 @router.get(
     "/posts/{article_no}",
-    summary="Get an SKKU CSE post",
+    summary=DETAIL_SUMMARY,
 )
 async def get_post(
     service: CseArticlePostServiceDep,

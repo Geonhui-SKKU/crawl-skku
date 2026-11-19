@@ -8,12 +8,13 @@ from crawl_skku.article.cscience.schemas import (
     CscienceArticlePostDetail,
     SkkuCscienceArticlePostListItem,
 )
+from crawl_skku.article.metadata import DETAIL_SUMMARY, LIST_SUMMARY, notice_tag
 from crawl_skku.exceptions import SkkuCrawlerError
 
-router = APIRouter(tags=["SKKU CScience posts"])
+router = APIRouter(tags=[notice_tag("cscience")])
 
 
-@router.get("/posts", summary="List SKKU CScience posts")
+@router.get("/posts", summary=LIST_SUMMARY)
 async def list_posts(
     service: CscienceArticlePostServiceDep,
     offset: Annotated[int, Query(ge=0)] = 0,
@@ -29,7 +30,7 @@ async def list_posts(
 
 @router.get(
     "/posts/{board_id}/{item_id}",
-    summary="Get an SKKU CScience post",
+    summary=DETAIL_SUMMARY,
 )
 async def get_post(
     service: CscienceArticlePostServiceDep,

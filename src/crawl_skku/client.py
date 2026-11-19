@@ -1,8 +1,8 @@
 """High-level asynchronous client for supported SKKU public sources."""
 
 from datetime import date
-from typing import Protocol
 
+from crawl_skku.article.board_service import NumberedArticleBoard
 from crawl_skku.article.college_sources import (
     INTEGRATED_COLLEGE_BOARDS,
     NUMBERED_COLLEGE_BOARDS,
@@ -13,6 +13,7 @@ from crawl_skku.article.cscience.schemas import (
 )
 from crawl_skku.article.cscience.service import CscienceArticlePostService
 from crawl_skku.article.cse.service import CseArticlePostService
+from crawl_skku.article.department_sources import NUMBERED_DEPARTMENT_BOARDS
 from crawl_skku.article.enc.service import EncArticlePostService
 from crawl_skku.article.ice.service import IceArticlePostService
 from crawl_skku.article.root.service import RootArticlePostService
@@ -29,14 +30,6 @@ from crawl_skku.calendar.root.service import RootCalendarService
 from crawl_skku.calendar.schemas import SkkuCalendarDay, SkkuCalendarMonth
 
 
-class _ArticlePostService(Protocol):
-    async def get_posts(
-        self, *, offset: int, limit: int
-    ) -> list[SkkuArticlePostListItem]: ...
-
-    async def get_post(self, article_no: int) -> SkkuArticlePostDetail: ...
-
-
 class CrawlSkkuClient:
     """Fetch normalized SKKU public posts and academic calendar data.
 
@@ -45,7 +38,7 @@ class CrawlSkkuClient:
 
     def __init__(self) -> None:
         self._enc_article_service = EncArticlePostService()
-        self._article_services: dict[str, _ArticlePostService] = {
+        self._article_services: dict[str, NumberedArticleBoard] = {
             "root": RootArticlePostService(),
             "sw": SwArticlePostService(),
             "skb_swuniv": SkbSwunivArticlePostService(),
@@ -53,6 +46,7 @@ class CrawlSkkuClient:
             "sco": ScoArticlePostService(),
             "ice": IceArticlePostService(),
             **NUMBERED_COLLEGE_BOARDS,
+            **NUMBERED_DEPARTMENT_BOARDS,
         }
         self._cscience_article_service = CscienceArticlePostService()
         self._calendar_service = RootCalendarService()
@@ -122,7 +116,7 @@ class CrawlSkkuClient:
     async def get_calendar_day(self, day: date) -> SkkuCalendarDay:
         return await self._calendar_service.get_day(day)
 
-    def _article_service(self, source: str) -> _ArticlePostService:
+    def _article_service(self, source: str) -> NumberedArticleBoard:
         try:
             return self._article_services[source]
         except KeyError as exc:

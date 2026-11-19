@@ -2,9 +2,12 @@ from typing import Annotated
 
 from fastapi import APIRouter, HTTPException, Path, Query, status
 
-from crawl_skku.article.board_service import DEFAULT_LIMIT, MAX_LIMIT
-from crawl_skku.article.cms import IntegratedCmsBoard, NumberedCmsBoard
-from crawl_skku.article.pharm.service import PharmArticlePostService
+from crawl_skku.article.board_service import (
+    DEFAULT_LIMIT,
+    MAX_LIMIT,
+    NumberedArticleBoard,
+)
+from crawl_skku.article.cms import IntegratedCmsBoard
 from crawl_skku.article.schemas import (
     SkkuArticlePostDetail,
     SkkuArticlePostListItem,
@@ -18,9 +21,7 @@ Limit = Annotated[int, Query(ge=1, le=MAX_LIMIT)]
 PositiveId = Annotated[int, Path(ge=1)]
 
 
-def numbered_router(
-    source: str, board: NumberedCmsBoard | PharmArticlePostService
-) -> APIRouter:
+def numbered_router(source: str, board: NumberedArticleBoard) -> APIRouter:
     label = f"SKKU {source.upper()}"
     router = APIRouter(tags=[f"{label} posts"])
 
@@ -29,7 +30,7 @@ def numbered_router(
         offset: Offset = 0, limit: Limit = DEFAULT_LIMIT
     ) -> list[SkkuArticlePostListItem]:
         try:
-            return await board.get_posts(offset, limit)
+            return await board.get_posts(offset=offset, limit=limit)
         except SkkuCrawlerError as exc:
             raise _bad_gateway(exc) from exc
 

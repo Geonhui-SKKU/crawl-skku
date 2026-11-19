@@ -1,17 +1,26 @@
 from abc import ABC, abstractmethod
 from collections.abc import Callable
-from typing import Generic, TypeVar
+from typing import Generic, Protocol, TypeVar
 from urllib.parse import urlencode
 
 from pydantic import BaseModel
 
 from crawl_skku import cache, service
+from crawl_skku.article.schemas import SkkuArticlePostDetail, SkkuArticlePostListItem
 
 DEFAULT_LIMIT = 10
 MAX_LIMIT = 50
 
 PostT = TypeVar("PostT", bound=BaseModel)
 DetailT = TypeVar("DetailT", bound=BaseModel)
+
+
+class NumberedArticleBoard(Protocol):
+    async def get_posts(
+        self, *, offset: int, limit: int
+    ) -> list[SkkuArticlePostListItem]: ...
+
+    async def get_post(self, article_no: int) -> SkkuArticlePostDetail: ...
 
 
 class CachedArticleBoard(ABC, Generic[PostT]):
@@ -48,10 +57,13 @@ class CachedArticleBoard(ABC, Generic[PostT]):
         params: dict[str, int | str],
         model: type[DetailT],
         parse: Callable[[str, str], DetailT],
+        url: str | None = None,
     ) -> DetailT:
         async def load() -> DetailT:
-            html = await service.fetch_html(self.url, params=params)
-            return parse(html, f"{self.url}?{urlencode(params)}")
+            request_url = url or self.url
+            html = await service.fetch_html(request_url, params=params)
+            detail_url = f"{request_url}?{urlencode(params)}" if params else request_url
+            return parse(html, detail_url)
 
         settings = cache.get_cache_settings()
         return await cache.get_or_load(

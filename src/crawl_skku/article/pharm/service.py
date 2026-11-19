@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup, Tag
 
 from crawl_skku import service
 from crawl_skku.article import utils
-from crawl_skku.article.board_service import CachedArticleBoard
+from crawl_skku.article.paged_board import PagedArticleBoard
 from crawl_skku.article.schemas import (
     SkkuArticleKey,
     SkkuArticlePostDetail,
@@ -29,7 +29,7 @@ def _post_date(tag: Tag | None) -> date:
         raise SkkuParseError("Could not parse SKKU Pharmacy post date") from exc
 
 
-def parse_post_list(html: str) -> list[SkkuArticlePostListItem]:
+def parse_post_list(html: str, url: str = BOARD_URL) -> list[SkkuArticlePostListItem]:
     board = BeautifulSoup(html, "html.parser").select_one("#board_list")
     if board is None:
         raise SkkuParseError("Could not find SKKU Pharmacy post list")
@@ -58,7 +58,7 @@ def parse_post_list(html: str) -> list[SkkuArticlePostListItem]:
                 title=title,
                 author=utils.tag_text(row.select_one(".bo_info .write")) or None,
                 date=_post_date(row.select_one(".bo_info .time")),
-                url=utils.absolute_url(BOARD_URL, href),
+                url=utils.absolute_url(url, href),
                 has_attachment=row.select_one(".lst_file") is not None,
             )
         )
@@ -89,26 +89,22 @@ def parse_post_detail(html: str, url: str, article_no: int) -> SkkuArticlePostDe
     )
 
 
-class PharmArticlePostService(CachedArticleBoard[SkkuArticlePostListItem]):
-    def __init__(self) -> None:
-        super().__init__("pharm", BOARD_URL, list[SkkuArticlePostListItem])
+class PharmArticlePostService(PagedArticleBoard):
+    def __init__(
+        self,
+        source: str = "pharm",
+        url: str = BOARD_URL,
+        page_size: int = PAGE_SIZE,
+    ) -> None:
+        super().__init__(source, url, page_size)
 
-    async def _load_posts(
-        self, offset: int, limit: int
-    ) -> list[SkkuArticlePostListItem]:
-        page_index, start = divmod(offset, PAGE_SIZE)
-        posts: list[SkkuArticlePostListItem] = []
-        while len(posts) < limit:
-            html = await service.fetch_html(
-                BOARD_URL, params={"bo_table": BOARD_NAME, "page": page_index + 1}
-            )
-            page = parse_post_list(html)
-            posts.extend(page[start : start + limit - len(posts)])
-            if len(page) < PAGE_SIZE:
-                break
-            page_index += 1
-            start = 0
-        return posts
+    async def _load_page(
+        self, page: int
+    ) -> tuple[list[SkkuArticlePostListItem], list[SkkuArticlePostListItem]]:
+        html = await service.fetch_html(
+            self.url, params={"bo_table": BOARD_NAME, "page": page}
+        )
+        return [], parse_post_list(html, self.url)
 
     async def get_post(self, article_no: int) -> SkkuArticlePostDetail:
         return await self._get_detail(

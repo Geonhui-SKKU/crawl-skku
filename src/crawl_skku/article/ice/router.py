@@ -4,13 +4,14 @@ from fastapi import APIRouter, HTTPException, Path, Query, status
 
 from crawl_skku.article.ice import constants
 from crawl_skku.article.ice.dependencies import IceArticlePostServiceDep
+from crawl_skku.article.metadata import DETAIL_SUMMARY, LIST_SUMMARY, notice_tag
 from crawl_skku.article.schemas import SkkuArticlePostDetail, SkkuArticlePostListItem
 from crawl_skku.exceptions import SkkuCrawlerError
 
-router = APIRouter(tags=["SKKU ICE posts"])
+router = APIRouter(tags=[notice_tag("ice")])
 
 
-@router.get("/posts", summary="List SKKU ICE posts")
+@router.get("/posts", summary=LIST_SUMMARY)
 async def list_posts(
     service: IceArticlePostServiceDep,
     offset: Annotated[int, Query(ge=0)] = 0,
@@ -24,7 +25,7 @@ async def list_posts(
         raise _bad_gateway(exc) from exc
 
 
-@router.get("/posts/{article_no}", summary="Get an SKKU ICE post")
+@router.get("/posts/{article_no}", summary=DETAIL_SUMMARY)
 async def get_post(
     service: IceArticlePostServiceDep,
     article_no: Annotated[int, Path(ge=1)],

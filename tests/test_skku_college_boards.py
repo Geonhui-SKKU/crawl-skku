@@ -226,6 +226,20 @@ class CollegeBoardTests(unittest.IsolatedAsyncioTestCase):
         paths = app.openapi()["paths"]
         self.assertCountEqual(INTEGRATED_COLLEGE_BOARDS, INTEGRATED_SOURCES)
         self.assertCountEqual(NUMBERED_COLLEGE_BOARDS, NUMBERED_SOURCES)
+        expected_tags = {
+            "biz": "경영대학",
+            "ecostat": "경제대학",
+            "pharm": "약학대학",
+            "art": "예술대학",
+            "biotech": "생명공학대학",
+            "coe": "사범대학",
+            "hakbu": "학부대학",
+            "ics": "성균융합원",
+            "liberalarts": "문과대학",
+            "scos": "유학대학",
+            "sport": "스포츠과학대학",
+            "sscience": "사회과학대학",
+        }
         for source in (*INTEGRATED_SOURCES, *NUMBERED_SOURCES):
             with self.subTest(source=source):
                 base = f"/skku/article/{source}/posts"
@@ -235,7 +249,8 @@ class CollegeBoardTests(unittest.IsolatedAsyncioTestCase):
                     else "/{article_no}"
                 )
                 self.assertEqual(
-                    paths[base]["get"]["tags"], [f"SKKU {source.upper()} posts"]
+                    paths[base]["get"]["tags"],
+                    [f"성균관대학교 {expected_tags[source]} 공지사항"],
                 )
                 self.assertIn(base + suffix, paths)
 

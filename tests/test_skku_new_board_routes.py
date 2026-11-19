@@ -36,31 +36,31 @@ class SkkuNewBoardRouteTests(unittest.TestCase):
 
         self.assertEqual(
             paths["/skku/article/sw/posts"]["get"]["tags"],
-            ["SKKU SW posts"],
+            ["성균관대학교 소프트웨어융합대학 공지사항"],
         )
         self.assertEqual(
             paths["/skku/article/skb_swuniv/posts"]["get"]["tags"],
-            ["SKKU SKB SWUNIV posts"],
+            ["성균관대학교 SW중심대학사업단 공지사항"],
         )
         self.assertEqual(
             paths["/skku/article/cse/posts"]["get"]["tags"],
-            ["SKKU CSE posts"],
+            ["성균관대학교 소프트웨어학과 공지사항"],
         )
         self.assertEqual(
             paths["/skku/article/cscience/posts"]["get"]["tags"],
-            ["SKKU CScience posts"],
+            ["성균관대학교 자연과학대학 공지사항"],
         )
         self.assertEqual(
             paths["/skku/article/sco/posts"]["get"]["tags"],
-            ["SKKU SCO posts"],
+            ["성균관대학교 글로벌융합학부 공지사항"],
         )
         self.assertEqual(
             paths["/skku/article/enc/posts"]["get"]["tags"],
-            ["SKKU ENC posts"],
+            ["성균관대학교 공과대학 공지사항"],
         )
         self.assertEqual(
             paths["/skku/article/ice/posts"]["get"]["tags"],
-            ["SKKU ICE posts"],
+            ["성균관대학교 정보통신대학 공지사항"],
         )
 
 

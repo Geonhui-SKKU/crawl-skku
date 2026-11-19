@@ -7,12 +7,12 @@ from crawl_skku.calendar.root.dependencies import RootCalendarServiceDep
 from crawl_skku.calendar.schemas import SkkuCalendarDay, SkkuCalendarMonth
 from crawl_skku.exceptions import SkkuCrawlerError
 
-router = APIRouter(tags=["SKKU root calendar"])
+router = APIRouter(tags=["성균관대학교 학사일정"])
 
 
 @router.get(
     "/month",
-    summary="Get SKKU general academic calendar month",
+    summary="월별 학사일정 조회",
 )
 async def get_month(
     service: RootCalendarServiceDep,
@@ -27,7 +27,7 @@ async def get_month(
 
 @router.get(
     "/days/{date}",
-    summary="Get SKKU general academic calendar day",
+    summary="일별 학사일정 조회",
 )
 async def get_day(
     service: RootCalendarServiceDep,
